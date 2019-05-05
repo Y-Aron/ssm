@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!-- 配置过滤器 -->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <!-- 设置字符编码 -->
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <!-- 是否强制所有请求都使用该字符编码 -->
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <!-- 拦截所有请求 -->
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+
+    <!-- 配置SpringMVC的核心控制器，基于DispatcherServlet -->
+    <servlet>
+        <servlet-name>SpringMvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath*:spring/spring-mvc.xml</param-value>
+        </init-param>
+        <!--
+            1. load-on-startup元素标记容器是否在启动的时候就加载这个servlet(实例化并调用其init()方法)
+            2. 它的值必须是一个整数，表示servlet应该被载入的顺序
+            3. 当值为0或者大于0时，表示容器在应用启动时就加载并初始化这个servlet
+            4. 当值小于0或者没有指定时，则表示容器在该servlet被选择时才会去加载
+            5. 正数的值越小，该servlet的优先级越高，应用启动时就越先加载
+            6. 当值相同时，容器就会自己选择顺序来加载
+        -->
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- 指定进入SpringMVC核心控制器的URL-->
+    <servlet-mapping>
+        <servlet-name>SpringMvc</servlet-name>
+        <!--
+            目录下所有的url、包括css、图片等静态资源，但不包括其他的Servlet
+            注意：此处不要配置/*. /* 一般是拦截器使用
+         -->
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+</web-app>

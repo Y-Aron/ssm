@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 加载数据库配置文件 -->
+    <context:property-placeholder location="classpath:spring/jdbc.properties"/>
+
+    <!-- 配置Hikari连接池 -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="maximumPoolSize" value="10"/>
+        <property name="minimumIdle" value="3"/>
+        <property name="dataSourceProperties"
+                  value="#{{cachePrepStmts: true, prepStmtCacheSize: 250, prepStmtCacheSqlLimit: 2048}}"/>
+    </bean>
+
+    <!-- 配置 SqlSessionFactory  -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+        <!-- 别名 -->
+        <property name="typeAliasesPackage" value="org.aron.ssm.domain.pojo"/>
+        <!-- 注入mybatis核心配置文件 -->
+        <property name="mapperLocations" value="classpath:mybatis/mapper/*.xml"/>
+    </bean>
+
+    <!-- 自动扫描对象关系映射 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!--
+            当上下文中只有一个 org.mybatis.spring.SqlSessionFactoryBean时可以不用设置
+            value的值为 bean的id
+        -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <!-- 指定要自动扫描接口的基础包,实现接口 -->
+        <property name="basePackage" value="org.aron.ssm.domain.dao"/>
+    </bean>
+
+    <!-- 声明式事务管理 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 支持注解驱动的事务管理，指定事务管理器 -->
+    <tx:annotation-driven/>
+
+    <!-- 开启注解扫描器, base-package: 要扫描的包路径 -->
+    <context:component-scan base-package="org.aron.ssm.*"/>
+
+    <!-- aspectj支持自动代理实现AOP功能 -->
+    <!--    <aop:aspectj-autoproxy proxy-target-class="true" />-->
+</beans>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- 加载数据库配置文件 -->
+    <context:property-placeholder location="classpath:spring/jdbc.properties" />
+
+    <!-- 配置Hikari连接池 -->
+    <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="jdbcUrl" value="${jdbc.url}" />
+        <property name="driverClassName" value="${jdbc.driver}" />
+        <property name="username" value="${jdbc.username}" />
+        <property name="password" value="${jdbc.password}" />
+        <property name="maximumPoolSize" value="10" />
+        <property name="minimumIdle" value="3" />
+        <property name="dataSourceProperties" value="#{{cachePrepStmts: true, prepStmtCacheSize: 250, prepStmtCacheSqlLimit: 2048}}" />
+    </bean>
+
+    <!-- 配置 SqlSessionFactory  -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 注入数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 别名 -->
+        <property name="typeAliasesPackage" value="org.aron.ssm.domain.pojo" />
+        <!-- 注入mybatis的配置文件 -->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
+    </bean>
+
+    <!-- Dao中注入sqlSessionFactory -->
+    <bean id="userDao" class="org.aron.ssm.domain.dao.impl.UserDaoImpl">
+        <property name="sqlSessionFactory" ref="sqlSessionFactory" />
+    </bean>
+
+    <bean class="org.aron.ssm.service.impl.UserServiceImpl" id="userService">
+        <property name="userDao" ref="userDao" />
+    </bean>
+
+</beans>

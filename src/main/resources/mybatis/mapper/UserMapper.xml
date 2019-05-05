@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.aron.ssm.domain.dao.UserDao">
+
+    <sql id="base_columns">`name`, `desc`, `nickname`</sql>
+
+  <select id="selectAll" parameterType="int" resultType="User">
+    SELECT <include refid="base_columns" /> FROM tb_user
+  </select>
+
+  <insert id="insert" parameterType="org.aron.ssm.domain.pojo.User">
+    insert into tb_user (<include refid="base_columns" />)
+    values (#{name,jdbcType=VARCHAR}, #{desc,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR})
+  </insert>
+</mapper>
